@@ -14,9 +14,9 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_DB: db_pbo_app
+          POSTGRES_DB: db_nina_proyek
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: ningnong18
         ports:
           - 5432:5432
         options: >-

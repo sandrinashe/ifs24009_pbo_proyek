@@ -4,7 +4,7 @@ import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.constraints.NotNull;
 
-public class CoverTodoForm {
+public class CoverSongForm {
 
     private UUID id;
 
@@ -12,7 +12,7 @@ public class CoverTodoForm {
     private MultipartFile coverFile;
 
     // Constructor
-    public CoverTodoForm() {
+    public CoverSongForm() {
     }
 
     // Getters and Setters
@@ -57,5 +57,25 @@ public class CoverTodoForm {
 
     public boolean isSizeValid(long maxSize) {
         return coverFile != null && coverFile.getSize() <= maxSize;
+    }
+
+    // Additional validation for song cover
+    public String getFileExtension() {
+        if (coverFile == null || coverFile.getOriginalFilename() == null) {
+            return null;
+        }
+        String filename = coverFile.getOriginalFilename();
+        int lastDot = filename.lastIndexOf('.');
+        return lastDot > 0 ? filename.substring(lastDot + 1).toLowerCase() : null;
+    }
+
+    public boolean isValidExtension() {
+        String extension = getFileExtension();
+        return extension != null && 
+               (extension.equals("jpg") || 
+                extension.equals("jpeg") || 
+                extension.equals("png") || 
+                extension.equals("gif") || 
+                extension.equals("webp"));
     }
 }
