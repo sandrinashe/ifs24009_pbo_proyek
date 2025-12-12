@@ -102,6 +102,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- START: Tambahan untuk H2 Database Khusus Pengujian (Memperbaiki Error) -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- END: Tambahan untuk H2 Database Khusus Pengujian -->
+
 		<!-- Dependency for Spring Boot DevTools -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
