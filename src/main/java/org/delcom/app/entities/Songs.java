@@ -140,12 +140,12 @@ public class Songs {
     }
 
     // ======= @PrePersist & @PreUpdate =======
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
+@PrePersist
+protected void onCreate() {
+    LocalDateTime now = LocalDateTime.now(); // Ambil waktu sekali saja
+    this.createdAt = now;
+    this.updatedAt = now; // Gunakan variable yang sama
+}
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
