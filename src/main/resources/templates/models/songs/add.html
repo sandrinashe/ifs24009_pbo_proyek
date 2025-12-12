@@ -1,0 +1,147 @@
+<!-- templates/models/songs/add.html -->
+<div th:fragment="addSongModal" class="modal fade" id="addSongModal" tabindex="-1" aria-labelledby="addSongModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addSongModalLabel">
+                    <i class="bi bi-music-note-beamed me-2"></i>Tambah Lagu Baru
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/songs/add}" method="post" th:object="${songForm}" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="songTitle" class="form-label">Judul Lagu <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="songTitle" th:field="*{title}" 
+                               placeholder="Masukkan judul lagu" required maxlength="255">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="songArtist" class="form-label">Artist <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="songArtist" th:field="*{artist}" 
+                               placeholder="Masukkan nama artist" required maxlength="255">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="songAlbum" class="form-label">Album</label>
+                        <input type="text" class="form-control" id="songAlbum" th:field="*{album}" 
+                               placeholder="Masukkan nama album (opsional)" maxlength="255">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="songGenre" class="form-label">Genre <span class="text-danger">*</span></label>
+                            <select class="form-select" id="songGenre" th:field="*{genre}" required>
+                                <option value="">Pilih Genre</option>
+                                <option value="Pop">Pop</option>
+                                <option value="Rock">Rock</option>
+                                <option value="Jazz">Jazz</option>
+                                <option value="Classical">Classical</option>
+                                <option value="Hip Hop">Hip Hop</option>
+                                <option value="R&B">R&B</option>
+                                <option value="Country">Country</option>
+                                <option value="Electronic">Electronic</option>
+                                <option value="Reggae">Reggae</option>
+                                <option value="Blues">Blues</option>
+                                <option value="Metal">Metal</option>
+                                <option value="Folk">Folk</option>
+                                <option value="Latin">Latin</option>
+                                <option value="K-Pop">K-Pop</option>
+                                <option value="Indie">Indie</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="songReleaseYear" class="form-label">Tahun Rilis</label>
+                            <input type="number" class="form-control" id="songReleaseYear" th:field="*{releaseYear}" 
+                                   placeholder="2024" min="1900" max="2100">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="songDuration" class="form-label">Durasi (detik) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="songDuration" th:field="*{duration}" 
+                               placeholder="Contoh: 180 (3 menit)" required min="1" max="7200">
+                        <small class="form-text text-muted">Masukkan durasi dalam detik (1-7200)</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="songCover" class="form-label">Cover Lagu</label>
+                        <input type="file" class="form-control" id="songCover" name="coverFile" 
+                               accept="image/jpeg,image/png,image/gif,image/webp">
+                        <small class="form-text text-muted">Format: JPG, PNG, GIF, WebP. Maksimal 5MB. (Opsional)</small>
+                    </div>
+
+                    <div class="mb-3" id="addCoverPreview" style="display: none;">
+                        <label class="form-label">Preview Cover:</label>
+                        <div class="border rounded p-2 bg-light text-center">
+                            <img id="addPreviewImage" src="" alt="Preview" class="img-fluid rounded" style="max-height: 150px;">
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <small>Kolom bertanda <span class="text-danger">*</span> wajib diisi</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i>Tambah Lagu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    // Auto-open modal jika ada error atau flag dari server
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function() {
+        var addSongModalOpen = /*[[${addSongModalOpen}]]*/ false;
+        if (addSongModalOpen) {
+            var addModal = new bootstrap.Modal(document.getElementById('addSongModal'));
+            addModal.show();
+        }
+
+        // Preview cover saat tambah lagu
+        const addCoverInput = document.getElementById('songCover');
+        if (addCoverInput) {
+            addCoverInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                const previewDiv = document.getElementById('addCoverPreview');
+                const previewImg = document.getElementById('addPreviewImage');
+
+                if (file) {
+                    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                    if (!validTypes.includes(file.type)) {
+                        alert('Format file tidak valid. Gunakan JPG, PNG, GIF, atau WebP.');
+                        addCoverInput.value = '';
+                        previewDiv.style.display = 'none';
+                        return;
+                    }
+
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Ukuran file terlalu besar. Maksimal 5MB.');
+                        addCoverInput.value = '';
+                        previewDiv.style.display = 'none';
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImg.src = e.target.result;
+                        previewDiv.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    previewDiv.style.display = 'none';
+                }
+            });
+        }
+    });
+    /*]]>*/
+</script>

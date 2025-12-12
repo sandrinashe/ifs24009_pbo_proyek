@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+      layout:decorate="~{layouts/base}" 
+      lang="id">
+<head>
+    <title th:text="'Detail - ' + ${song.title}">Detail Lagu</title>
+</head>
+<body>
+    <div layout:fragment="content" class="container py-4 bg-light min-vh-100">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}" class="text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Detail Lagu</li>
+            </ol>
+        </nav>
+
+        <!-- Alert Messages -->
+        <div th:if="${success}" class="alert alert-success border-0 shadow-sm alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i><strong th:text="${success}"></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger border-0 shadow-sm alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><strong th:text="${error}"></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row">
+            <!-- Cover Section -->
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-4 position-relative mx-auto" style="max-width: 300px;">
+                            <img th:if="${song.cover != null}" th:src="@{'/songs/cover/' + ${song.cover}}" 
+                                 alt="Song Cover" class="img-fluid rounded-4 shadow" style="width: 100%; aspect-ratio: 1/1; object-fit: cover;">
+                            
+                            <div th:if="${song.cover == null}" class="bg-light rounded-4 d-flex align-items-center justify-content-center shadow-inner" 
+                                 style="width: 100%; aspect-ratio: 1/1;">
+                                <i class="bi bi-music-note-beamed text-muted opacity-25" style="font-size: 5rem;"></i>
+                            </div>
+                        </div>
+
+                        <!-- Tombol Trigger Modal Cover -->
+                        <button type="button" class="btn btn-primary rounded-pill w-100 fw-bold" 
+                                data-bs-toggle="modal" data-bs-target="#editCoverSongModal">
+                            <i class="bi bi-camera me-2"></i>
+                            <span th:text="${song.cover != null} ? 'Ganti Cover' : 'Upload Cover'">Upload</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Section -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-file-earmark-music me-2 text-primary"></i>Informasi Lagu</h5>
+                        
+                        <!-- Action Buttons -->
+                        <div>
+                            <button type="button" class="btn btn-warning btn-sm rounded-pill px-3 me-1" 
+                                    th:data-id="${song.id}" th:data-title="${song.title}" th:data-artist="${song.artist}" 
+                                    th:data-album="${song.album}" th:data-genre="${song.genre}" th:data-duration="${song.duration}" 
+                                    th:data-year="${song.releaseYear}"
+                                    onclick="openEditModal(this)">
+                                <i class="bi bi-pencil-fill me-1"></i>Edit
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm rounded-pill px-3" 
+                                    th:attr="onclick=|prepareDeleteSong('${song.id}', '${song.title}')|">
+                                <i class="bi bi-trash-fill me-1"></i>Hapus
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <h1 class="display-6 fw-bold text-dark mb-1" th:text="${song.title}">Judul</h1>
+                        <p class="text-muted fs-5 mb-4" th:text="${song.artist}">Artist</p>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-3">
+                                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Album</small>
+                                    <div class="fw-medium text-dark" th:text="${song.album} ?: '-'">-</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-3">
+                                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Genre</small>
+                                    <div class="fw-medium text-dark">
+                                        <span class="badge bg-primary text-white rounded-pill" th:text="${song.genre}">Pop</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-3">
+                                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Durasi</small>
+                                    <div class="fw-medium text-dark">
+                                        <i class="bi bi-clock me-1 text-muted"></i>
+                                        <span th:with="minutes=${song.duration / 60}, seconds=${song.duration % 60}"
+                                              th:text="${#numbers.formatInteger(minutes, 1, 'DEFAULT')} + ':' + ${#numbers.formatInteger(seconds, 2, 'DEFAULT')}">0:00</span>
+                                        <span class="text-muted small ms-1" th:text="'(' + ${song.duration} + ' detik)'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-3">
+                                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Tahun Rilis</small>
+                                    <div class="fw-medium text-dark" th:text="${song.releaseYear} ?: '-'">2024</div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="p-3 bg-light rounded-3">
+                                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Song ID</small>
+                                    <div class="fw-mono text-dark font-monospace small" th:text="${song.id}">UUID</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-top">
+                            <small class="text-muted">
+                                <i class="bi bi-calendar3 me-1"></i> Ditambahkan pada: <span th:text="${#temporals.format(song.createdAt, 'dd MMMM yyyy, HH:mm')}">Date</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INCLUDE MODALS -->
+        <!-- Perhatikan path file di bawah ini, pastikan filenya ada -->
+        <div th:replace="~{models/songs/edit :: editSongModal}"></div>
+        <div th:replace="~{models/songs/delete :: deleteSongModal}"></div>
+        <div th:replace="~{models/songs/edit-cover :: editCoverSongModal}"></div>
+    </div>
+
+    <!-- SCRIPT (Disamakan dengan home.html agar modal berfungsi) -->
+    <script layout:fragment="others-js">
+        function openEditModal(element) {
+            document.getElementById("editSongId").value = element.getAttribute('data-id');
+            document.getElementById("editSongTitle").value = element.getAttribute('data-title');
+            document.getElementById("editSongArtist").value = element.getAttribute('data-artist');
+            document.getElementById("editSongAlbum").value = element.getAttribute('data-album');
+            document.getElementById("editSongGenre").value = element.getAttribute('data-genre');
+            document.getElementById("editSongDuration").value = element.getAttribute('data-duration');
+            document.getElementById("editSongReleaseYear").value = element.getAttribute('data-year');
+            
+            const previewDiv = document.getElementById('editCoverPreview');
+            const fileInput = document.getElementById('editSongCover');
+            if(previewDiv) previewDiv.style.display = 'none';
+            if(fileInput) fileInput.value = '';
+
+            new bootstrap.Modal(document.getElementById("editSongModal")).show();
+        }
+
+        function prepareDeleteSong(id, title) {
+            document.getElementById("deleteSongId").value = id;
+            document.getElementById("deleteSongTitle").innerText = title;
+            const confirmInput = document.getElementById("confirmTitle");
+            if(confirmInput) confirmInput.value = "";
+            new bootstrap.Modal(document.getElementById("deleteSongModal")).show();
+        }
+    </script>
+</body>
+</html>

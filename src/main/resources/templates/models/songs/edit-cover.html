@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- 
+    Fragment ini akan dipanggil oleh detail.html 
+    menggunakan th:replace="~{models/songs/edit-cover :: editCoverSongModal}"
+-->
+<div th:fragment="editCoverSongModal">
+    <div class="modal fade" id="editCoverSongModal" tabindex="-1" 
+         aria-labelledby="editCoverSongModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow rounded-4">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="editCoverSongModalLabel">
+                        <i class="bi bi-camera-fill text-primary me-2"></i>Upload Cover
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <form th:action="@{/songs/edit-cover}" method="post" enctype="multipart/form-data" 
+                      th:object="${coverSongForm}">
+                    
+                    <!-- Hidden ID is crucial -->
+                    <input type="hidden" th:field="*{id}">
+                    
+                    <div class="modal-body p-4">
+                        <!-- 1. Tampilan Cover Saat Ini (Jika Ada) -->
+                        <div class="mb-4 text-center" th:if="${song.cover != null}">
+                            <p class="text-muted small mb-2 fw-bold text-uppercase">Cover Saat Ini</p>
+                            <div class="position-relative d-inline-block">
+                                <img th:src="@{'/songs/cover/' + ${song.cover}}" 
+                                     alt="Current Cover" 
+                                     class="img-fluid rounded-4 shadow-sm" 
+                                     style="width: 150px; height: 150px; object-fit: cover;">
+                            </div>
+                        </div>
+
+                        <!-- 2. Alert Info (Jika Belum Ada) -->
+                        <div class="mb-4" th:if="${song.cover == null}">
+                            <div class="alert alert-light border-0 shadow-sm d-flex align-items-center rounded-3">
+                                <i class="bi bi-info-circle-fill text-info me-3 fs-4"></i>
+                                <small class="text-muted">Lagu ini belum memiliki gambar cover album.</small>
+                            </div>
+                        </div>
+
+                        <!-- 3. Input File -->
+                        <div class="mb-3">
+                            <label for="coverFile" class="form-label fw-bold small">PILIH FILE BARU</label>
+                            <input type="file" class="form-control form-control-lg bg-light border-0" 
+                                   id="coverFile" 
+                                   th:field="*{coverFile}" 
+                                   accept="image/jpeg,image/png,image/gif,image/webp" 
+                                   required>
+                            <div class="d-flex justify-content-between mt-1">
+                                <small class="text-muted" style="font-size: 0.75rem;">Format: JPG, PNG, WebP</small>
+                                <small class="text-muted" style="font-size: 0.75rem;">Max: 5MB</small>
+                            </div>
+                        </div>
+
+                        <!-- 4. Preview Area (Hidden by default via JS logic) -->
+                        <div class="mb-0" id="previewContainer" style="display: none;">
+                            <label class="form-label fw-bold small">PREVIEW COVER BARU</label>
+                            <div class="border-2 border-dashed border-light rounded-4 p-3 text-center bg-white" id="newCoverPreview">
+                                <!-- Image will be injected here via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-top-0 pt-0 pb-4 px-4">
+                        <button type="button" class="btn btn-light rounded-pill px-4 fw-medium" data-bs-dismiss="modal">
+                            Batal
+                        </button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                            <i class="bi bi-cloud-upload-fill me-2"></i>Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Inline (Dimasukkan ke dalam fragment agar terbawa saat di-replace) -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Logic Preview Gambar
+            const coverFileInput = document.getElementById('coverFile');
+            const previewDiv = document.getElementById('newCoverPreview');
+            const previewContainer = document.getElementById('previewContainer');
+
+            if (coverFileInput) {
+                coverFileInput.addEventListener('change', function(event) {
+                    const file = event.target.files[0];
+                    
+                    if (file) {
+                        // Validasi Tipe
+                        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                        if (!validTypes.includes(file.type)) {
+                            alert('Format file tidak valid. Gunakan JPG, PNG, GIF, atau WebP.');
+                            coverFileInput.value = '';
+                            previewContainer.style.display = 'none';
+                            return;
+                        }
+
+                        // Validasi Ukuran (5MB)
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('Ukuran file terlalu besar. Maksimal 5MB.');
+                            coverFileInput.value = '';
+                            previewContainer.style.display = 'none';
+                            return;
+                        }
+
+                        // Tampilkan Preview
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            previewDiv.innerHTML = `
+                                <img src="${e.target.result}" 
+                                     class="img-fluid rounded-3 shadow-sm" 
+                                     style="width: 150px; height: 150px; object-fit: cover;">
+                            `;
+                            previewContainer.style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        previewContainer.style.display = 'none';
+                        previewDiv.innerHTML = '';
+                    }
+                });
+            }
+
+            // 2. Logic Auto-Open Modal jika ada Error dari Server
+            // Mengambil variabel dari Controller (RedirectAttributes)
+            var editCoverSongModalOpen = /*[[${editCoverSongModalOpen}]]*/ false;
+            
+            if (editCoverSongModalOpen) {
+                var modalElement = document.getElementById('editCoverSongModal');
+                if (modalElement) {
+                    var coverModal = new bootstrap.Modal(modalElement);
+                    coverModal.show();
+                }
+            }
+        });
+    </script>
+</div>
+</html>

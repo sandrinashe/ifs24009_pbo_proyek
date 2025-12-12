@@ -1,0 +1,60 @@
+<!-- templates/models/songs/delete.html -->
+<div th:fragment="deleteSongModal">
+    <div class="modal fade" id="deleteSongModal" tabindex="-1" 
+         aria-labelledby="deleteSongModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteSongModalLabel">
+                        <i class="bi bi-trash me-2"></i>Hapus Lagu
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/songs/delete}" method="post">
+                    <input type="hidden" id="deleteSongId" name="id">
+                    
+                    <div class="modal-body">
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Perhatian!</strong> Tindakan ini tidak dapat dibatalkan.
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6 class="card-title">Lagu yang Akan Dihapus:</h6>
+                                <p class="mb-0">
+                                    <strong id="deleteSongTitle">Song Title</strong>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirmTitle" class="form-label">
+                                Ketik judul lagu untuk konfirmasi <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="confirmTitle" 
+                                   name="confirmTitle" placeholder="Ketik judul lagu" 
+                                   required autocomplete="off">
+                            <small class="form-text text-muted">
+                                Ketik judul lagu yang sama untuk mengonfirmasi penghapusan
+                            </small>
+                        </div>
+
+                        <div class="alert alert-warning" role="alert">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <small>Cover lagu (jika ada) juga akan dihapus secara permanen.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle me-1"></i>Batal
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i>Ya, Hapus Lagu
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

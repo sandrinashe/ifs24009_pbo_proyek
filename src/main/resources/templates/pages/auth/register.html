@@ -5,122 +5,171 @@
   layout:decorate="~{layouts/base}"
 >
   <head>
-    <title>Daftar - Spring Boot Todolist</title>
+    <title>Daftar - Music Manager</title>
+    <style>
+        .login-card {
+            border: none;
+            border-radius: 1.5rem; /* rounded-4 */
+            box-shadow: 0 1rem 3rem rgba(0,0,0,.175);
+            overflow: hidden;
+        }
+        .form-control-lg {
+            font-size: 0.95rem;
+            padding-top: 0.7rem;
+            padding-bottom: 0.7rem;
+        }
+        /* Menggunakan gradient ungu/biru untuk membedakan sedikit dengan login, atau samakan saja */
+        .bg-register-accent {
+            background: linear-gradient(135deg, #6610f2 0%, #0d6efd 100%);
+        }
+    </style>
   </head>
   <body>
-    <div layout:fragment="content" class="mt-5">
-      <form
-        th:action="@{/auth/register/post}"
-        method="post"
-        th:object="${registerForm}"
-      >
-        <div class="card mx-auto" style="max-width: 360px">
-          <div class="card-body">
-            <div>
-              <div class="text-center">
-                <img
-                  th:src="@{/assets/images/logo.png}"
-                  alt="Logo"
-                  width="64"
-                />
-                <hr />
-                <h5>Daftar</h5>
-                <span class="text-muted">
-                  Lengkapi form pendaftaran berikut untuk membuat akun baru
-                </span>
-                <hr />
-              </div>
+    <div layout:fragment="content" class="d-flex align-items-center justify-content-center min-vh-100 py-5 bg-light">
+      
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-6 col-lg-5 col-xl-4">
+            
+            <div class="card login-card bg-white">
+              <!-- Header Accent -->
+              <div class="bg-register-accent p-2"></div>
 
-              <!-- Pesan Error Global -->
-              <div
-                th:if="${#fields.hasGlobalErrors()}"
-                class="alert alert-danger"
-              >
-                <th:block
-                  th:each="err : ${#fields.globalErrors()}"
-                  th:text="${err}"
-                ></th:block>
-              </div>
-
-              <!-- Nama -->
-              <div class="form-group mb-3">
-                <label for="inputName">Nama Lengkap</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="inputName"
-                  th:field="*{name}"
-                  th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
-                />
-                <div
-                  th:if="${#fields.hasErrors('name')}"
-                  class="invalid-feedback"
+              <div class="card-body p-4 p-md-5">
+                
+                <form
+                  th:action="@{/auth/register/post}"
+                  method="post"
+                  th:object="${registerForm}"
                 >
-                  <th:block
-                    th:each="err : ${#fields.errors('name')}"
-                    th:text="${err}"
-                  ></th:block>
-                </div>
-              </div>
+                  <!-- Logo & Header -->
+                  <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded-circle mb-3 text-primary" style="width: 70px; height: 70px;">
+                        <!-- Logo Image with fallback icon -->
+                        <img
+                          th:src="@{/assets/images/logo.png}"
+                          alt="Logo"
+                          width="40"
+                          class="d-block"
+                          onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';"
+                        />
+                        <i class="bi bi-person-plus-fill fs-2" style="display:none;"></i>
+                    </div>
+                    
+                    <h4 class="fw-bold text-dark">Buat Akun Baru</h4>
+                    <p class="text-muted small mb-0">
+                      Mulai kelola koleksi musik Anda hari ini.
+                    </p>
+                  </div>
 
-              <!-- Alamat Email -->
-              <div class="form-group mb-3">
-                <label for="inputEmail">Email</label>
-                <input
-                  type="email"
-                  class="form-control"
-                  id="inputEmail"
-                  th:field="*{email}"
-                  th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
-                />
-                <div
-                  th:if="${#fields.hasErrors('email')}"
-                  class="invalid-feedback"
-                >
-                  <th:block
-                    th:each="err : ${#fields.errors('email')}"
-                    th:text="${err}"
-                  ></th:block>
-                </div>
-              </div>
+                  <!-- Pesan Error Global -->
+                  <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger border-0 shadow-sm rounded-3 d-flex align-items-center p-3 mb-4">
+                    <i class="bi bi-exclamation-circle-fill fs-5 me-3"></i>
+                    <div class="small">
+                        <th:block th:each="err : ${#fields.globalErrors()}">
+                            <span th:text="${err}">Error message</span><br/>
+                        </th:block>
+                    </div>
+                  </div>
 
-              <!-- Kata Sandi -->
-              <div class="form-group mb-3">
-                <label for="inputPassword">Kata Sandi</label>
-                <input
-                  type="password"
-                  class="form-control"
-                  id="inputPassword"
-                  th:field="*{password}"
-                  th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
-                />
-                <div
-                  th:if="${#fields.hasErrors('password')}"
-                  class="invalid-feedback"
-                >
-                  <th:block
-                    th:each="err : ${#fields.errors('password')}"
-                    th:text="${err}"
-                  ></th:block>
-                </div>
-              </div>
+                  <!-- Nama Lengkap -->
+                  <div class="form-group mb-3">
+                    <label for="inputName" class="form-label small fw-bold text-secondary text-uppercase ms-1">Nama Lengkap</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted ps-3 rounded-start-3">
+                            <i class="bi bi-person"></i>
+                        </span>
+                        <input
+                          type="text"
+                          class="form-control form-control-lg bg-light border-start-0 rounded-end-3"
+                          id="inputName"
+                          th:field="*{name}"
+                          th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
+                          placeholder="Nama Anda"
+                          autocomplete="name"
+                        />
+                        <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback ms-2">
+                          <th:block th:each="err : ${#fields.errors('name')}" th:text="${err}"></th:block>
+                        </div>
+                    </div>
+                  </div>
 
-              <!-- Tombol Masuk -->
-              <div class="form-group mt-3 text-end">
-                <button type="submit" class="btn btn-primary btn-block">
-                  Masuk
-                </button>
-              </div>
+                  <!-- Alamat Email -->
+                  <div class="form-group mb-3">
+                    <label for="inputEmail" class="form-label small fw-bold text-secondary text-uppercase ms-1">Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted ps-3 rounded-start-3">
+                            <i class="bi bi-envelope"></i>
+                        </span>
+                        <input
+                          type="email"
+                          class="form-control form-control-lg bg-light border-start-0 rounded-end-3"
+                          id="inputEmail"
+                          th:field="*{email}"
+                          th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                          placeholder="nama@email.com"
+                          autocomplete="email"
+                        />
+                        <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback ms-2">
+                          <th:block th:each="err : ${#fields.errors('email')}" th:text="${err}"></th:block>
+                        </div>
+                    </div>
+                  </div>
 
-              <hr />
-              <p class="text-center">
-                Sudah memiliki akun?
-                <a th:href="@{/auth/login}">Masuk</a>
-              </p>
+                  <!-- Kata Sandi -->
+                  <div class="form-group mb-4">
+                    <label for="inputPassword" class="form-label small fw-bold text-secondary text-uppercase ms-1">Kata Sandi</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted ps-3 rounded-start-3">
+                            <i class="bi bi-lock"></i>
+                        </span>
+                        <input
+                          type="password"
+                          class="form-control form-control-lg bg-light border-start-0 rounded-end-3"
+                          id="inputPassword"
+                          th:field="*{password}"
+                          th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
+                          placeholder="Buat kata sandi kuat"
+                          autocomplete="new-password"
+                        />
+                        <div th:if="${#fields.hasErrors('password')}" class="invalid-feedback ms-2">
+                          <th:block th:each="err : ${#fields.errors('password')}" th:text="${err}"></th:block>
+                        </div>
+                    </div>
+                  </div>
+
+                  <!-- Tombol Daftar -->
+                  <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm">
+                      <i class="bi bi-person-check me-2"></i>Daftar Sekarang
+                    </button>
+                  </div>
+
+                  <div class="my-4 d-flex align-items-center">
+                    <hr class="flex-grow-1 my-0 bg-secondary bg-opacity-25">
+                    <span class="mx-3 text-muted small text-uppercase">Sudah punya akun?</span>
+                    <hr class="flex-grow-1 my-0 bg-secondary bg-opacity-25">
+                  </div>
+
+                  <!-- Link Login -->
+                  <p class="text-center mb-0">
+                    <a th:href="@{/auth/login}" class="btn btn-outline-secondary rounded-pill w-100 fw-medium">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Masuk ke Akun
+                    </a>
+                  </p>
+
+                </form>
+              </div>
             </div>
+
+            <!-- Footer Text -->
+            <div class="text-center mt-4 text-muted small opacity-75">
+                &copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2024</span> Music Playlist Manager
+            </div>
+
           </div>
         </div>
-      </form>
+      </div>
     </div>
   </body>
 </html>

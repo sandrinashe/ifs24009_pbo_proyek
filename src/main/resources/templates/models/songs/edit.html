@@ -1,0 +1,151 @@
+<!-- templates/models/songs/edit.html -->
+<div th:fragment="editSongModal">
+    <div class="modal fade" id="editSongModal" tabindex="-1" 
+         aria-labelledby="editSongModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editSongModalLabel">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Lagu
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/songs/edit}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" id="editSongId" name="id">
+                    
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="editSongTitle" class="form-label">
+                                Judul Lagu <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="editSongTitle" 
+                                   name="title" placeholder="Masukkan judul lagu" required maxlength="255">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editSongArtist" class="form-label">
+                                Artist <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="editSongArtist" 
+                                   name="artist" placeholder="Masukkan nama artist" required maxlength="255">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editSongAlbum" class="form-label">Album</label>
+                            <input type="text" class="form-control" id="editSongAlbum" 
+                                   name="album" placeholder="Masukkan nama album (opsional)" maxlength="255">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editSongGenre" class="form-label">
+                                    Genre <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="editSongGenre" name="genre" required>
+                                    <option value="">Pilih Genre</option>
+                                    <option value="Pop">Pop</option>
+                                    <option value="Rock">Rock</option>
+                                    <option value="Jazz">Jazz</option>
+                                    <option value="Classical">Classical</option>
+                                    <option value="Hip Hop">Hip Hop</option>
+                                    <option value="R&B">R&B</option>
+                                    <option value="Country">Country</option>
+                                    <option value="Electronic">Electronic</option>
+                                    <option value="Reggae">Reggae</option>
+                                    <option value="Blues">Blues</option>
+                                    <option value="Metal">Metal</option>
+                                    <option value="Folk">Folk</option>
+                                    <option value="Latin">Latin</option>
+                                    <option value="K-Pop">K-Pop</option>
+                                    <option value="Indie">Indie</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="editSongReleaseYear" class="form-label">Tahun Rilis</label>
+                                <input type="number" class="form-control" id="editSongReleaseYear" 
+                                       name="releaseYear" placeholder="2024" min="1900" max="2100">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editSongDuration" class="form-label">
+                                Durasi (detik) <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" class="form-control" id="editSongDuration" 
+                                   name="duration" placeholder="Contoh: 180 (3 menit)" required min="1" max="7200">
+                            <small class="form-text text-muted">Masukkan durasi dalam detik (1-7200)</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editSongCover" class="form-label">Ganti Cover Lagu</label>
+                            <input type="file" class="form-control" id="editSongCover" name="coverFile" 
+                                   accept="image/jpeg,image/png,image/gif,image/webp">
+                            <small class="form-text text-muted">Format: JPG, PNG, GIF, WebP. Maksimal 5MB. (Opsional - kosongkan jika tidak ingin mengganti)</small>
+                        </div>
+
+                        <div class="mb-3" id="editCoverPreview" style="display: none;">
+                            <label class="form-label">Preview Cover Baru:</label>
+                            <div class="border rounded p-2 bg-light text-center">
+                                <img id="editPreviewImage" src="" alt="Preview" class="img-fluid rounded" style="max-height: 150px;">
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <small>Pastikan semua data sudah benar sebelum menyimpan perubahan.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle me-1"></i>Batal
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-1"></i>Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Preview cover saat edit lagu
+        const editCoverInput = document.getElementById('editSongCover');
+        if (editCoverInput) {
+            editCoverInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                const previewDiv = document.getElementById('editCoverPreview');
+                const previewImg = document.getElementById('editPreviewImage');
+
+                if (file) {
+                    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                    if (!validTypes.includes(file.type)) {
+                        alert('Format file tidak valid. Gunakan JPG, PNG, GIF, atau WebP.');
+                        editCoverInput.value = '';
+                        previewDiv.style.display = 'none';
+                        return;
+                    }
+
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Ukuran file terlalu besar. Maksimal 5MB.');
+                        editCoverInput.value = '';
+                        previewDiv.style.display = 'none';
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImg.src = e.target.result;
+                        previewDiv.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    previewDiv.style.display = 'none';
+                }
+            });
+        }
+    });
+</script>

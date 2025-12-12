@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.UUID;
 
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
 import org.delcom.app.dto.CoverSongForm;
 import org.delcom.app.dto.SongForm;
 import org.delcom.app.entities.Songs;
@@ -44,6 +47,7 @@ public class SongView {
 
     @PostMapping("/add")
     public String postAddSong(@Valid @ModelAttribute("songForm") SongForm songForm,
+            @RequestParam(value = "coverFile", required = false) MultipartFile coverFile,
             RedirectAttributes redirectAttributes,
             HttpSession session,
             Model model) {
@@ -106,6 +110,28 @@ public class SongView {
             return "redirect:/";
         }
 
+        // Upload cover jika ada
+        if (coverFile != null && !coverFile.isEmpty()) {
+            // Validasi file
+            if (!fileStorageService.isValidImage(coverFile)) {
+                redirectAttributes.addFlashAttribute("error", "Format file cover tidak valid");
+                return "redirect:/";
+            }
+
+            if (!fileStorageService.isValidSize(coverFile, 5 * 1024 * 1024)) {
+                redirectAttributes.addFlashAttribute("error", "Ukuran file cover terlalu besar");
+                return "redirect:/";
+            }
+
+            try {
+                String fileName = fileStorageService.storeFile(coverFile, entity.getId());
+                songsService.updateCover(entity.getId(), fileName);
+            } catch (IOException e) {
+                redirectAttributes.addFlashAttribute("error", "Gagal upload cover, tapi lagu berhasil ditambahkan");
+                return "redirect:/";
+            }
+        }
+
         // Redirect dengan pesan sukses
         redirectAttributes.addFlashAttribute("success", "Lagu berhasil ditambahkan.");
         return "redirect:/";
@@ -113,6 +139,7 @@ public class SongView {
 
     @PostMapping("/edit")
     public String postEditSong(@Valid @ModelAttribute("songForm") SongForm songForm,
+            @RequestParam(value = "coverFile", required = false) MultipartFile coverFile,
             RedirectAttributes redirectAttributes,
             HttpSession session,
             Model model) {
@@ -188,13 +215,35 @@ public class SongView {
             return "redirect:/";
         }
 
+        // Upload cover baru jika ada
+        if (coverFile != null && !coverFile.isEmpty()) {
+            // Validasi file
+            if (!fileStorageService.isValidImage(coverFile)) {
+                redirectAttributes.addFlashAttribute("error", "Format file cover tidak valid");
+                return "redirect:/";
+            }
+
+            if (!fileStorageService.isValidSize(coverFile, 5 * 1024 * 1024)) {
+                redirectAttributes.addFlashAttribute("error", "Ukuran file cover terlalu besar");
+                return "redirect:/";
+            }
+
+            try {
+                String fileName = fileStorageService.storeFile(coverFile, songForm.getId());
+                songsService.updateCover(songForm.getId(), fileName);
+            } catch (IOException e) {
+                redirectAttributes.addFlashAttribute("error", "Gagal upload cover, tapi data lagu berhasil diperbarui");
+                return "redirect:/";
+            }
+        }
+
         // Redirect dengan pesan sukses
         redirectAttributes.addFlashAttribute("success", "Lagu berhasil diperbarui.");
         return "redirect:/";
     }
 
     @PostMapping("/delete")
-    public String postDeleteSong(@Valid @ModelAttribute("songForm") SongForm songForm,
+    public String postDeleteSong(@ModelAttribute("songForm") SongForm songForm,
             RedirectAttributes redirectAttributes,
             HttpSession session,
             Model model) {

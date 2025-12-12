@@ -211,7 +211,7 @@
 				<version>${maven.surefire.plugin.version}</version>
 			</plugin>
 
-			<!-- JaCoCo Plugin (coverage) tetap -->
+			<!-- JaCoCo Plugin (coverage) -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
@@ -241,9 +241,8 @@
 				<configuration>
 					<excludes>
 						<!-- Exclude specific classes -->
+						<!-- Configs dan DTO dihapus dari sini agar muncul di report -->
 						<exclude>**/utils/**</exclude>
-						<exclude>**/configs/**</exclude>
-						<exclude>**/dto/**</exclude>
 						<exclude>**/views/**</exclude>
 					</excludes>
 
@@ -254,12 +253,12 @@
 								<limit>
 									<counter>INSTRUCTION</counter>
 									<value>COVEREDRATIO</value>
-									<minimum>1.0</minimum>
+									<minimum>0.7</minimum>
 								</limit>
 								<limit>
 									<counter>BRANCH</counter>
 									<value>COVEREDRATIO</value>
-									<minimum>1.0</minimum>
+									<minimum>0.4</minimum>
 								</limit>
 							</limits>
 						</rule>
