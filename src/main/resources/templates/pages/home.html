@@ -123,39 +123,48 @@
                                     </td>
                                 </tr>
                                 <tr th:each="song : ${songs}" class="song-row border-bottom border-light">
+                                    <!-- COVER -->
                                     <td class="ps-4 py-3">
-    <div style="width: 55px; height: 55px;" class="position-relative">
-        
-        <!-- 1. GAMBAR COVER -->
-        <!-- 
-             Perubahan: 
-             1. Menambahkan '?v=' + timestamp agar browser selalu mengambil gambar terbaru (tidak cache).
-             2. Menambahkan 'onerror' script: Jika gambar gagal dimuat, sembunyikan gambar dan tampilkan ikon default.
-        -->
-        <img th:if="${song.cover != null}" 
-             th:src="@{'/songs/cover/' + ${song.cover} + '?v=' + ${#dates.createNow().time}}" 
-             class="rounded-3 shadow-sm object-fit-cover w-100 h-100 position-absolute top-0 start-0" 
-             alt="Cover"
-             onerror="this.style.display='none'; this.nextElementSibling.classList.remove('d-none'); this.nextElementSibling.classList.add('d-flex');">
-        
-        <!-- 2. DEFAULT ICON (FALLBACK) -->
-        <!-- 
-             Div ini akan muncul otomatis jika:
-             1. song.cover == null (dari server)
-             2. song.cover != null tapi gambarnya error (lewat script onerror di atas)
-        -->
-        <div th:classappend="${song.cover != null} ? 'd-none' : 'd-flex'"
-             class="bg-light border rounded-3 align-items-center justify-content-center text-muted w-100 h-100 position-absolute top-0 start-0">
-            <i class="bi bi-music-note fs-4"></i>
-        </div>
-        
-    </div>
-</td>
-                                    <td class="text-dark fw-medium" th:text="${song.artist}"></td>
-                                    <td><span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-1 fw-normal" th:text="${song.genre}"></span></td>
-                                    <td class="text-muted font-monospace small">
-                                        <span th:with="minutes=${song.duration / 60}, seconds=${song.duration % 60}" th:text="${#numbers.formatInteger(minutes, 1, 'DEFAULT')} + ':' + ${#numbers.formatInteger(seconds, 2, 'DEFAULT')}"></span>
+                                        <div style="width: 55px; height: 55px;" class="position-relative">
+                                            
+                                            <!-- 1. GAMBAR COVER -->
+                                            <img th:if="${song.cover != null}" 
+                                                th:src="@{'/songs/cover/' + ${song.cover} + '?v=' + ${#dates.createNow().time}}" 
+                                                class="rounded-3 shadow-sm object-fit-cover w-100 h-100 position-absolute top-0 start-0" 
+                                                alt="Cover"
+                                                onerror="this.style.display='none'; this.nextElementSibling.classList.remove('d-none'); this.nextElementSibling.classList.add('d-flex');">
+                                            
+                                            <!-- 2. DEFAULT ICON (FALLBACK) -->
+                                            <div th:classappend="${song.cover != null} ? 'd-none' : 'd-flex'"
+                                                class="bg-light border rounded-3 align-items-center justify-content-center text-muted w-100 h-100 position-absolute top-0 start-0">
+                                                <i class="bi bi-music-note fs-4"></i>
+                                            </div>
+                                            
+                                        </div>
                                     </td>
+
+                                    <!-- JUDUL & ALBUM (PERBAIKAN) -->
+                                    <td class="text-dark fw-medium">
+                                        <!-- Judul Lagu -->
+                                        <div th:text="${song.title}">Title</div>
+                                        <!-- Album (dengan font kecil & miring) -->
+                                        <div class="text-muted small fst-italic" th:text="${song.album}">Album</div>
+                                    </td>
+                                    
+                                    <!-- ARTIST (PERBAIKAN) -->
+                                    <td class="text-dark fw-medium" th:text="${song.artist}"></td>
+                                    
+                                    <!-- GENRE (PERBAIKAN) -->
+                                    <td><span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-1 fw-normal" th:text="${song.genre}"></span></td>
+                                    
+                                    <!-- DURASI (PERBAIKAN) -->
+                                    <td class="text-muted font-monospace small">
+                                        <span th:with="minutes=${song.duration / 60}, seconds=${song.duration % 60}" 
+                                              th:text="${#numbers.formatInteger(minutes, 1, 'DEFAULT')} + ':' + ${#numbers.formatInteger(seconds, 2, 'DEFAULT')}">
+                                        </span>
+                                    </td>
+                                    
+                                    <!-- AKSI -->
                                     <td class="text-end pe-4">
                                         <div class="btn-group">
                                             <a th:href="@{/songs/{id}(id=${song.id})}" class="btn btn-light btn-sm text-primary rounded-circle shadow-sm me-1" 
